@@ -12,7 +12,7 @@ import {
     parseMessage,
 } from './protocol.js';
 
-const ALLOWED_HOST_ORIGINS = ['http://127.0.0.1:5173', 'http://localhost:5173'];
+const ALLOWED_HOST_ORIGINS = ['http://127.0.0.1:5173', 'http://localhost:5173', 'https://elvinlab.github.io'];
 const CAPABILITIES = ['key', 'saves-export'];
 
 // CheerpJ keeps the Java file system in this IndexedDB database, one record per path.
