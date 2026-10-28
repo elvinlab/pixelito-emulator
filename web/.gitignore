@@ -1,1 +1,4 @@
-/jar/
+/jar/*
+!/jar/gaem.jar
+!/jar/GAEM-LICENSE.txt
+!/jar/GAEM-NOTICE.txt

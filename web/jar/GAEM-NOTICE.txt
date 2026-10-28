@@ -1,0 +1,11 @@
+GAEM 0.15 (Graphical Adventure tiny Engine for Mobiles)
+Copyright (C) 2005 Victor Borrull
+
+`gaem.jar` is distributed here unmodified, under the GNU General Public License,
+version 2 or (at your option) any later version. The license text is in
+GAEM-LICENSE.txt.
+
+Project page and source code: http://gaemu.sourceforge.net/
+
+This file and the license text are the only things this repository adds around the jar.
+No other game is distributed here: `web/jar/` ignores everything else on purpose.
