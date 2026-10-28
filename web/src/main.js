@@ -1,6 +1,7 @@
 import { LibMedia } from "../libmedia/libmedia.js";
 import { LibMidi, createUnlockingAudioContext } from "../libmidi/libmidi.js";
 import { codeMap, KeyRepeatManager } from "./key.js";
+import { notifyStarted, startBridge } from "./pixelito-bridge.js";
 import { EventQueue } from "./eventqueue.js";
 import { initKbdListeners, setKbdHandler, kbdWidth, kbdHeight } from "./screenKbd.js";
 
@@ -87,6 +88,11 @@ function setListeners() {
 
     display.addEventListener('keydown', handleKeyEvent);
     display.addEventListener('keyup', handleKeyEvent);
+
+    startBridge((isDown, code) => {
+        const symbol = code.startsWith('Digit') ? code.substring(5) : '\x00';
+        keyRepeatManager.post(isDown, code, {symbol, ctrlKey: false, shiftKey: false});
+    });
 
     keyRepeatManager.register((kind, key, args) => {
         if (kind === 'click') {
@@ -246,8 +252,13 @@ async function init() {
     })
     window.libmedia = new LibMedia();
 
+    // The JRE pieces a typical start needs, fetched in parallel up front. The list
+    // comes from cjGetRuntimeResources() after a real start; a missing file is fine.
+    const preloadResources = await fetch('./preload-resources.json').then(r => r.json()).catch(() => ({}));
+
     await cheerpjInit({
         enableDebug: false,
+        preloadResources,
         natives: {
             ...canvasFontNatives,
             ...canvasGraphicsNatives,
@@ -272,6 +283,7 @@ async function init() {
                     display.style.display = '';
                     scaleSet = true;
                     display.focus();
+                    notifyStarted(width, height);
                 }
                 screenCtx.canvas.width = width;
                 screenCtx.canvas.height = height;
@@ -322,6 +334,12 @@ async function init() {
     const lib = await cheerpjRunLibrary(cheerpjWebRoot+"/freej2me-web.jar");
 
     const FreeJ2ME = await lib.org.recompile.freej2me.FreeJ2ME;
+
+    if (sp.get('warmup')) {
+        // Only warm the caches: no game starts, so nothing runs or plays.
+        window.parent.postMessage({ pixelitoWarmup: 'done' }, '*');
+        return;
+    }
 
     let args;
 
