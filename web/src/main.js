@@ -14,6 +14,9 @@ import jsReferenceNatives from "../libjs/libjsreference.js";
 import mediaBridgeNatives from "../libjs/libmediabridge.js";
 import midiBridgeNatives from "../libjs/libmidibridge.js";
 
+const embedded = window.parent !== window;
+if (embedded) document.body.classList.add('pixelito-host');
+
 const evtQueue = new EventQueue();
 const sp = new URLSearchParams(location.search);
 
@@ -58,7 +61,9 @@ function autoscale() {
     );
 
     if (!fractionScale) {
-        scale = scale|0;
+        // Embedded in Pixelito the screen should fill the phone: use half steps
+        // (1.5x, 2x, 2.5x...) instead of whole steps, which leave 240px games small.
+        scale = embedded ? Math.max(Math.floor(scale*2)/2, 1) : scale|0;
     }
 
     display.style.zoom = scale;
